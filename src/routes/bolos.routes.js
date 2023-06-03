@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { validadeSchema } from "../middlewares/bolo.middleware.js"
+import { validadeSchema } from "../middlewares/validate.middleware.js"
 import { boloSchema } from "../schemas/bolo.schema.js"
 import { cadastrarBolo } from "../controllers/bolos.controllers.js"
 
