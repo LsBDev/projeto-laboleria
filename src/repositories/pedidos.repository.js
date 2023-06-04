@@ -1,9 +1,9 @@
 import { db } from "../database/db.connection.js"
 
-export function buscarClienteDB({clientId}) {
+export function buscarClienteDB(id) {
   return db.query(`
     SELECT * FROM client WHERE id = $1;
-  `, [clientId])
+  `, [id])
 }
 export function buscarBoloDB({cakeId}) {
   return db.query(`
@@ -16,4 +16,19 @@ export function cadastrarPedidoDB(body) {
     INSERT INTO "order" (client_id, cake_id, quantity, total_price) 
     VALUES ($1, $2, $3, $4);
   `, [clientId, cakeId, quantity, totalPrice])
+}
+
+
+export function buscarPedidoIdClienteDB({id}) {
+  return db.query(`
+    SELECT 
+      "order".id AS "orderId", 
+      "order".quantity, 
+      "order".created_at AS "createdAt",
+      "order".total_price AS "totalPrice", 
+      cake.name AS "cakeName"
+      FROM "order"
+        JOIN cake ON "order".cake_id = cake.id
+      WHERE "order".client_id = $1;
+  `, [id])
 }
