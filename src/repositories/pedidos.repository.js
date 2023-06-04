@@ -18,20 +18,6 @@ export function cadastrarPedidoDB(body) {
   `, [clientId, cakeId, quantity, totalPrice])
 }
 
-export function buscarPedidoIdClienteDB({id}) {
-  return db.query(`
-    SELECT 
-      "order".id AS "orderId", 
-      "order".quantity, 
-      "order".created_at AS "createdAt",
-      "order".total_price AS "totalPrice", 
-      cake.name AS "cakeName"
-      FROM "order"
-        JOIN cake ON "order".cake_id = cake.id
-      WHERE "order".client_id = $1;
-  `, [id])
-}
-
 export function buscarTudoPedidoDB() {
   return db.query(`
     SELECT
@@ -59,4 +45,48 @@ export function buscarTudoPedidoDB() {
       JOIN
         cake ON "order".cake_id = cake.id;
 `)
+}
+
+export function buscarPedidoIdDB({id}) {
+  return db.query(`
+  SELECT
+    "order".id AS "orderId",
+    "order".quantity,
+    "order".created_at AS "createdAt",
+    "order".total_price AS "totalPrice",
+    client.id AS "clientId",
+    client.name AS "clientName",
+    address.address AS "clientAddress",
+    phone.phone AS "clientPhone",
+    cake.id AS "cakeId",
+    cake.name AS "cakeName",
+    cake.price AS "cakePrice",
+    cake.image AS "cakeImage",
+    cake.description AS "cakeDescription"
+    FROM
+      "order"
+    JOIN
+      client ON "order".client_id = client.id
+    JOIN
+      address ON client.id = address.client_id
+    JOIN
+      phone ON client.id = phone.client_id
+    JOIN
+      cake ON "order".cake_id = cake.id
+    WHERE "order".id = $1;
+  `, [id])
+}
+
+export function buscarPedidoIdClienteDB({id}) {
+  return db.query(`
+    SELECT 
+      "order".id AS "orderId", 
+      "order".quantity, 
+      "order".created_at AS "createdAt",
+      "order".total_price AS "totalPrice", 
+      cake.name AS "cakeName"
+      FROM "order"
+        JOIN cake ON "order".cake_id = cake.id
+      WHERE "order".client_id = $1;
+  `, [id])
 }

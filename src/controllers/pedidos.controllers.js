@@ -1,4 +1,4 @@
-import { buscarBoloDB, buscarClienteDB, buscarPedidoIdClienteDB, buscarTudoPedidoDB, cadastrarPedidoDB } from "../repositories/pedidos.repository.js"
+import { buscarBoloDB, buscarClienteDB, buscarPedidoIdClienteDB, buscarPedidoIdDB, buscarTudoPedidoDB, cadastrarPedidoDB } from "../repositories/pedidos.repository.js"
 import dayjs from "dayjs"
 
 
@@ -62,7 +62,40 @@ export async function buscarTudoPedido(req, res) {
   }
 }
 
+export async function buscarPedidoId(req, res) {
+  try {
+    const {rows} = await buscarPedidoIdDB(req.params)
+    if(rows.length === 0) return res.sendStatus(404)
+    const objeto = rows.map((order) => {
+      const client = {
+        id: order.clientId,
+        name: order.clientName,
+        address: order.clientAddress,
+        phone: order.clientPhone
+      }
+      const cake = {
+        id: order.cakeId,
+        name: order.cakeName,
+        price: order.cakePrice,
+        description: order.cakeDescription,
+        image: order.cakeImage
+      }
+      const objeto = {
+        client: client,
+        cake: cake,
+        orderId: order.orderId,
+        createdAt: dayjs(order.createdAt).format("YYYY-MM-DD HH:mm"),
+        quantity: order.quantity,
+        totalPrice: order.totalPrice
+      }
+      return objeto
+    })
+    res.status(200).send(objeto)
 
+  } catch(err) {
+    res.status(500).send(err.message)
+  }  
+}
 
 export async function buscarPedidoIdCliente(req, res) {
   const {id} = req.params
