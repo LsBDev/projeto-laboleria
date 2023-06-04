@@ -1,4 +1,5 @@
-import { buscarBoloDB, buscarClienteDB, buscarPedidoIdClienteDB, cadastrarPedidoDB } from "../repositories/pedidos.repository.js"
+import { buscarBoloDB, buscarClienteDB, buscarPedidoIdClienteDB, buscarTudoPedidoDB, cadastrarPedidoDB } from "../repositories/pedidos.repository.js"
+import dayjs from "dayjs"
 
 
 export async function cadastrarPedido(req,res) {
@@ -19,6 +20,50 @@ export async function cadastrarPedido(req,res) {
   }
 }
 
+export async function buscarTudoPedido(req, res) {
+  const {date} = req.query
+  try {
+    const {rows} = await buscarTudoPedidoDB()
+    if(!rows) return res.status(404).send([])
+
+    const objeto = rows.map((order) => {
+      const client = {
+        id: order.clientId,
+        name: order.clientName,
+        address: order.clientAddress,
+        phone: order.clientPhone
+      }
+      const cake = {
+        id: order.cakeId,
+        name: order.cakeName,
+        price: order.cakePrice,
+        description: order.cakeDescription,
+        image: order.cakeImage
+      }
+      const objeto = {
+        client: client,
+        cake: cake,
+        orderId: order.orderId,
+        createdAt: dayjs(order.createdAt).format("YYYY-MM-DD HH:mm"),
+        quantity: order.quantity,
+        totalPrice: order.totalPrice
+      }
+      return objeto
+    })
+
+    const objFiltrado = objeto.filter((order) => order.createdAt.includes(date))
+    if(date && objFiltrado.length === 0 || objeto.length === 0) return res.status(404).send(objFiltrado)
+    if(!date) return res.status(200).send(objeto)
+
+    res.status(200).send(objFiltrado)
+
+  }catch(err) {
+    res.send(err.message)
+  }
+}
+
+
+
 export async function buscarPedidoIdCliente(req, res) {
   const {id} = req.params
   try {
@@ -32,5 +77,8 @@ export async function buscarPedidoIdCliente(req, res) {
     res.status(500).send(err.message)
   }
 }
+
+
+
 
 
