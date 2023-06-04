@@ -5,11 +5,13 @@ export function buscarClienteDB(id) {
     SELECT * FROM client WHERE id = $1;
   `, [id])
 }
+
 export function buscarBoloDB({cakeId}) {
   return db.query(`
     SELECT name FROM cake WHERE id = $1;
   `, [cakeId])
 }
+
 export function cadastrarPedidoDB(body) {
   const {clientId, cakeId, quantity, totalPrice} = body
   return db.query(`
